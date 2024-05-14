@@ -1,0 +1,291 @@
+1) Criar a api de autenticação:
+
+	1a) Instalar os pacotes necessários
+		- AutoMapper
+		- AutoMapper.Extensions.Microsoft.DependencyInjection
+		- Microsoft.AspNetCore.Identity.EntityFrameworkCore
+		- Microsoft.EntityFrameworkCore
+		- Microsoft.EntityFrameworkCore.Sqlite
+		- Microsoft.EntityFrameworkCore.Tools
+
+	1b) Criar o model de extensão do IdentityUser
+	1c) Configurar o contexto
+	1d) Configurar o program
+		- builder.Services.AddDbContext<AppDbContext>(opt =>
+		  {
+   			opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+		  });
+
+		- builder.Services.AddIdentity<UserExtended, IdentityRole>()
+    			.AddEntityFrameworkStores<AppDbContext>()
+    			.AddDefaultTokenProviders();
+
+	1e) Fazer os migrations e atualizar a base
+	1f) Criar os Dtos para o response, usuário, registro e login (Models/Dtos)
+	
+	1g) Criar os Mappings (User -> UserDto>
+
+	1h) Criar as interfaces/serviços (Services/ IService)
+		- IAuthService -> Login / Registro / AddUserToRole
+
+			- Task<string> Register(RegisterRequestDto registerRequestDto);
+ 			- Task<LoginResponseDto> Login(LoginDto loginDto);
+			- Task<bool> AddUserToRole(string email, string role);
+
+		// LOGIN
+		public async Task<LoginResponseDto> Login(LoginDto loginDto)
+		{
+		    var user = _context.UserExtended.FirstOrDefault(x => x.UserName.ToLower() == loginDto.Username.ToLower());
+
+		    bool userValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+
+		    if (user != null || !userValid)
+		    {
+		        return new LoginResponseDto
+		        {
+		            User = null,
+		            Token = ""
+		        };
+		    }
+
+		    // Token
+
+		    var userDto = _mapper.Map<UserDto>(user);
+		    var loginResponse = new LoginResponseDto
+		    {
+		        User = userDto,
+		        Token = ""
+		    };
+
+		    return loginResponse;
+		}			
+
+		// REGISTER
+		public async Task<string> Register(RegisterRequestDto registerRequestDto)
+		{
+		    UserExtended userExtended = new()
+			{
+			    UserName = registerRequestDto.Email,
+			    Email = registerRequestDto.Email,
+			    NormalizedEmail = registerRequestDto.Email,
+			    Name = registerRequestDto.Name,
+			    PhoneNumber = registerRequestDto.PhoneNumber
+			};
+		
+		    try
+		    {
+		        var resultRegister = await _userManager.CreateAsync(userExtended, registerRequestDto.Password);
+		        if (resultRegister.Succeeded)
+		            return "";
+		         else
+ 			{
+			     var errrorMessageSb = new StringBuilder();
+			     int errorCount = 1;	
+			     foreach (var error in resultRegister.Errors)
+			     {
+			         errrorMessageSb.Append($"{errorCount}: {error.Description} ");
+			         errorCount++;
+			     }
+     
+			     return errrorMessageSb.ToString().Trim();
+			 }
+		    }
+		    catch (Exception ex)
+		    {
+		        return $"Erro encontrado: {ex.Message}";
+		    }
+		}
+
+		// ADD USER TO ROLE
+ 		public async Task<bool> AddUserToRole(string email, string role)
+		 {
+		     var user = _context.UserExtended.FirstOrDefault(x => x.UserName.ToLower() == email.ToLower());
+		     if (user != null)
+		     {
+		         if (!_roleManager.RoleExistsAsync(role).GetAwaiter().GetResult())
+		             _roleManager.CreateAsync(new IdentityRole(role)).GetAwaiter().GetResult();
+		
+		         await _userManager.AddToRoleAsync(user, role);
+		         return true;
+		     }
+
+		     return false;
+		 }
+
+	1i) - Registrar as interfaces e serviços
+		
+	1j) - Criar os endpoints para login / register/ addUserToRole
+
+
+
+		private readonly IAuthService _authService;
+		protected ResponseDto _response;
+
+		public AuthController(IAuthService authService)
+		{
+		    _authService = authService;
+		    _response = new();
+		}
+
+		[HttpPost("register")]
+		public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
+		{
+		    var errorMessage = await _authService.Register(registerRequestDto);
+
+		    if(!string.IsNullOrEmpty(errorMessage))
+		    {
+		        _response.IsSuccess = false;
+		        _response.Message = errorMessage;
+		        return BadRequest(_response);
+		    }
+		
+		    return Ok(_response);
+		}
+
+		[HttpPost("login")]
+		public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+		{
+		    var loginResult = await _authService.Login(loginDto);
+
+		    if(loginResult.User == null)
+		    {
+		        _response.IsSuccess = false;
+		        _response.Message = "Usuário ou senha inválidos.";
+		        return BadRequest(_response);
+		    }
+
+		    _response.Result = loginResult;
+		    return Ok(loginResult);
+		}
+
+		[HttpPost("add-user-to-role/{email}/{role}")]
+		public async Task<IActionResult> Add (string email, string role)
+		{
+		    var addUserToRoleResult = await _authService.AddUserToRole(email, role);
+		    if(!addUserToRoleResult)
+		    {
+		        _response.IsSuccess = false;
+		        _response.Message = $"Falha ao atribuir a role ao usuário: {email}";
+		        return BadRequest(_response);
+		    }
+	
+		    return Ok(_response);
+		}
+	
+	1k) Gerar Token
+		- Criar Model JwtOptions
+			
+			public string Issuer { get; set; } = string.Empty;
+        		public string Audiance { get; set; } = string.Empty;
+			public string Secret { get; set; } = string.Empty;
+
+	1l) Configurar IOption<JwtOptions> no program
+
+			builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("ApiSettings:JwtOptions"));
+
+	1m) Criar a Interface / Serviço JwtTokenGenerator
+
+		string GenerateToken(ApplicationUser user, IEnumerable<string> roles);
+
+	1n) Implementar Interface
+		
+			 private readonly JwtOptions _jwtOptions;
+
+			 public JwtTokenGenerator(IOptions<JwtOptions> jwtOptions)
+			 {
+			     _jwtOptions = jwtOptions.Value;
+			 }
+
+			 public string GenerateToken(UserExtended user, IEnumerable<string> roles)
+			 {
+			     var tokenHandler = new JwtSecurityTokenHandler();
+			
+			     var key = Encoding.ASCII.GetBytes(_jwtOptions.Secret);
+			
+			     var claims = new List<Claim>
+			     {
+			         new Claim(JwtRegisteredClaimNames.Email, user.Email),
+			         new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+			         new Claim(JwtRegisteredClaimNames.Name, user.Name),
+			     };
+
+			     claims.AddRange(roles.Select(x => new Claim(ClaimTypes.Role, x)));
+
+     			var tokenDescriptor = new SecurityTokenDescriptor
+			     {
+			         Audience = _jwtOptions.Audiance,
+			         Issuer = _jwtOptions.Issuer,
+			         Subject = new ClaimsIdentity(claims),
+			         Expires = DateTime.UtcNow.AddDays(2),
+			         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
+			     };
+			
+			     var token = tokenHandler.CreateToken(tokenDescriptor);
+			
+			     return tokenHandler.WriteToken(token);
+			 }	
+
+
+	1o) Registrar Interface / Serviço do token
+			
+	1p) Injetar na AuthService e gerar o token no login 
+		
+		Método Login -> Adicionar:
+
+			 var roles = await _userManager.GetRolesAsync(user);
+			 var token = _tokenGenerator.GenerateToken(user, roles);
+			 var loginResponse = new LoginResponseDto
+			 {
+  			   	User = userDto,
+    			 	Token = token
+ 			 };
+
+2) Criar Api B que irá consumir o auth
+
+	2a) Configurar a autorização:
+		builder.Services.AddAuthentication(x =>
+		{
+		    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+		    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+		}).AddJwtBearer(x =>
+		{
+		    x.TokenValidationParameters = new TokenValidationParameters
+		    {
+		        ValidateIssuerSigningKey = true,
+		        IssuerSigningKey = new SymmetricSecurityKey(key),
+		        ValidateIssuer = true,
+		        ValidIssuer = issuer,
+		        ValidateAudience = true,
+		        ValidAudience = audiance
+		    };
+		});
+		
+		// Middleware
+		 app.UseAuthentication();
+
+	2b) Configurar o botão swagger
+		builder.Services.AddSwaggerGen(opt =>
+		{
+		    opt.AddSecurityDefinition(name: "Bearer", securityScheme: new OpenApiSecurityScheme
+		    {
+		        Name = "Authorization",
+		        Description = "Insira a autenticação Bearer da forma a seguir: `Bearer <Token>`",
+		        In = ParameterLocation.Header,
+		        Type = SecuritySchemeType.ApiKey,
+		        Scheme = "Bearer"
+		    });
+	
+		    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+		    {
+		        {
+		            new OpenApiSecurityScheme
+		            {
+		                Reference = new OpenApiReference
+		                {
+		                    Type = ReferenceType.SecurityScheme,
+		                    Id = JwtBearerDefaults.AuthenticationScheme
+		                }
+		            }, new string[]{}
+		        }
+		    });
+		});

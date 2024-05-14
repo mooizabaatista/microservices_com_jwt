@@ -9,7 +9,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{1F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microservices.Services.AuthAPI", "Microservices.Services.AuthAPI\Microservices.Services.AuthAPI.csproj", "{AF09ACF9-1AEF-44A8-B818-992FD56BD3A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microservices.Services.Product", "Microservices.Services.Product\Microservices.Services.Product.csproj", "{93607373-7824-42F6-9176-050DD1037A48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microservices.Services.Product", "Microservices.Services.Product\Microservices.Services.Product.csproj", "{93607373-7824-42F6-9176-050DD1037A48}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Passo_a_Passo", "Passo_a_Passo", "{B5F3A211-556F-4B14-BFA1-4A45E1E4B76E}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\Desktop\MICROSERVICES_01_TOKEN.txt = ..\..\..\Desktop\MICROSERVICES_01_TOKEN.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
