@@ -1,0 +1,70 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\p-mbsilva\\source\\repos\\Microservices\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{93607373-7824-42F6-9176-050DD1037A48}|Microservices.Services.Product\\Microservices.Services.Product.csproj|c:\\users\\p-mbsilva\\source\\repos\\microservices\\microservices.services.product\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{93607373-7824-42F6-9176-050DD1037A48}|Microservices.Services.Product\\Microservices.Services.Product.csproj|solutionrelative:microservices.services.product\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{93607373-7824-42F6-9176-050DD1037A48}|Microservices.Services.Product\\Microservices.Services.Product.csproj|c:\\users\\p-mbsilva\\source\\repos\\microservices\\microservices.services.product\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{93607373-7824-42F6-9176-050DD1037A48}|Microservices.Services.Product\\Microservices.Services.Product.csproj|solutionrelative:microservices.services.product\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1656819213:0:{bf84ea66-d821-4dba-b1b1-2777d8574775}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:2:0:{fabf9319-47eb-497e-b8f6-d9f73fba5f55}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1512001799:0:{bf84ea66-d821-4dba-b1b1-2777d8574775}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1203707908:0:{bf84ea66-d821-4dba-b1b1-2777d8574775}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\p-mbsilva\\source\\repos\\Microservices\\Microservices.Services.Product\\appsettings.json",
+              "RelativeDocumentMoniker": "Microservices.Services.Product\\appsettings.json",
+              "ToolTip": "C:\\Users\\p-mbsilva\\source\\repos\\Microservices\\Microservices.Services.Product\\appsettings.json",
+              "RelativeToolTip": "Microservices.Services.Product\\appsettings.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAOAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-05-14T12:19:05.842Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\p-mbsilva\\source\\repos\\Microservices\\Microservices.Services.Product\\Program.cs",
+              "RelativeDocumentMoniker": "Microservices.Services.Product\\Program.cs",
+              "ToolTip": "C:\\Users\\p-mbsilva\\source\\repos\\Microservices\\Microservices.Services.Product\\Program.cs",
+              "RelativeToolTip": "Microservices.Services.Product\\Program.cs",
+              "ViewState": "AQIAABIAAAAAAAAAAAAAAC8AAAAPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-05-14T11:43:06.454Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
